@@ -13,38 +13,79 @@ import ARKit
 extension MTKView : RenderDestinationProvider {
 }
 
+
 class ViewController: UIViewController, MTKViewDelegate, ARSessionDelegate {
     
     var session: ARSession!
     var renderer: Renderer!
     
+    // Convenience typed reference to the metal view
+    private var metalView: MTKView {
+        return self.view as! MTKView
+    }
+    
+    // MARK: - UIViewController life-cycle
+    
+    // 1. Create an MTKView as this controller’s main view
+    override func loadView() {
+        let mtkView = MTKView(frame: UIScreen.main.bounds,
+                              device: MTLCreateSystemDefaultDevice())
+        mtkView.backgroundColor = .clear
+        self.view = mtkView
+    }
+    
+    // 2. Usual setup
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Set the view's delegate
-        session = ARSession()
+        session         = ARSession()
         session.delegate = self
         
-        // Set the view to use the default device
-        if let view = self.view as? MTKView {
-            view.device = MTLCreateSystemDefaultDevice()
-            view.backgroundColor = UIColor.clear
-            view.delegate = self
-            
-            guard view.device != nil else {
-                print("Metal is not supported on this device")
-                return
-            }
-            
-            // Configure the renderer to draw to the view
-            renderer = Renderer(session: session, metalDevice: view.device!, renderDestination: view)
-            
-            renderer.drawRectResized(size: view.bounds.size)
+        guard let device = metalView.device else {
+            fatalError("Metal is not supported on this device")
         }
         
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(ViewController.handleTap(gestureRecognize:)))
-        view.addGestureRecognizer(tapGesture)
+        metalView.delegate = self
+        
+        // Configure the renderer to draw to the view
+        renderer = Renderer(session: session,
+                            metalDevice: device,
+                            renderDestination: metalView)
+        renderer.drawRectResized(size: metalView.bounds.size)
+        
+        // Tap gesture
+        let tap = UITapGestureRecognizer(target: self,
+                                         action: #selector(handleTap(gestureRecognize:)))
+        view.addGestureRecognizer(tap)
     }
+    
+//    override func viewDidLoad() {
+//        super.viewDidLoad()
+//        
+//        // Set the view's delegate
+//        session = ARSession()
+//        session.delegate = self
+//        
+//        // Set the view to use the default device
+//        if let view = self.view as? MTKView {
+//            view.device = MTLCreateSystemDefaultDevice()
+//            view.backgroundColor = UIColor.clear
+//            view.delegate = self
+//            
+//            guard view.device != nil else {
+//                print("Metal is not supported on this device")
+//                return
+//            }
+//            
+//            // Configure the renderer to draw to the view
+//            renderer = Renderer(session: session, metalDevice: view.device!, renderDestination: view)
+//            
+//            renderer.drawRectResized(size: view.bounds.size)
+//        }
+//        
+//        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(ViewController.handleTap(gestureRecognize:)))
+//        view.addGestureRecognizer(tapGesture)
+//    }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
