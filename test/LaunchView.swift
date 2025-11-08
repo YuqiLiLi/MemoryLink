@@ -1,32 +1,56 @@
+//
+//  LaunchView.swift
+//  YourProjectName
+//
+//  Created by Your Name on 2023-08-XX.
+//
+
 import SwiftUI
 
 struct LaunchView: View {
-
-    @State private var showAR = false
-    @State private var showScanner = false
-    @State private var lastSavedURL: URL?
-
+    
+    // Which full-screen sheet is being shown?
+    @State private var showARView      = false
+    @State private var showScanner     = false
+    @State private var showSavedScans  = false
+    
     var body: some View {
-        VStack(spacing: 40) {
-            Text("Welcome to My AR App")
-                .font(.largeTitle).bold()
-
-            Button("Enter AR View") { showAR = true }
+        NavigationView {
+            VStack(spacing: 32) {
+                
+                Spacer()
+                
+                Text("AR Demo")
+                    .font(.largeTitle).bold()
+                
+                // 1) AR Experience ------------------------------------------------
+                Button(action: { showARView = true }) {
+                    Label("Enter AR View", systemImage: "arkit")
+                        .frame(maxWidth: .infinity)
+                }
                 .buttonStyle(.borderedProminent)
-            
-            Button("Scan New Object") { showScanner = true }
+                
+                // 2) Object Scanner ----------------------------------------------
+                Button(action: { showScanner = true }) {
+                    Label("Scan Object", systemImage: "viewfinder")
+                        .frame(maxWidth: .infinity)
+                }
                 .buttonStyle(.bordered)
-        }
-        .fullScreenCover(isPresented: $showAR) {
-            ARViewContainer()
-                .ignoresSafeArea()
-        }
-        .fullScreenCover(isPresented: $showScanner) {
-            ObjectScannerContainer { url in      // completion handler
-                showScanner = false
-                self.lastSavedURL = url
+                
+                // 3) Saved Scans --------------------------------------------------
+                NavigationLink(destination: SavedObjectsView()) {
+                    Label("Saved Scans", systemImage: "tray.full")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                
+                Spacer()
             }
-            .ignoresSafeArea()
+            .padding()
+            .navigationTitle("Start")
+            // full-screen sheets for AR and Scanner (need to cover whole screen)
+            .fullScreenCover(isPresented: $showARView)     { ARExperienceView() }
+            .fullScreenCover(isPresented: $showScanner)    { ScannerExperienceView() }
         }
     }
 }
