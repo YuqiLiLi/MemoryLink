@@ -17,12 +17,12 @@ struct ARViewContainer: UIViewControllerRepresentable {
     // MARK: - UIViewControllerRepresentable conformance
     
     /// Create and return the UIKit view controller that does all the AR work.
-    func makeUIViewController(context: Context) -> ViewController {
-        return ViewController()        // ← your existing AR/Metal view controller
+    func makeUIViewController(context: Context) -> MasterViewController {
+        return MasterViewController()        // ← your existing AR/Metal view controller
     }
     
     /// No dynamic updates needed; the AR view controller manages itself.
-    func updateUIViewController(_ uiViewController: ViewController,
+    func updateUIViewController(_ uiViewController: MasterViewController,
                                 context: Context) {
         // Intentionally left empty.
     }

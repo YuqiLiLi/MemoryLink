@@ -1,3 +1,11 @@
+//
+//  BoundingBox.swift
+//  test
+//
+//  Created by Ruchen Cai on 11/8/25.
+//
+
+
 //  BoundingBox.swift
 import SceneKit
 import simd
@@ -113,6 +121,13 @@ final class BoundingBox {
             node.addChildNode(n)
             handleNodes.append(n)
         }
+    }
+    
+    func scale(by factor: Float) {
+        // avoid collapsing to almost zero
+        let minSide: Float = 0.02          // 2 cm
+        extent = simd_max(extent * factor, SIMD3<Float>(repeating: minSide))
+        updateGeometry()
     }
 }
 
