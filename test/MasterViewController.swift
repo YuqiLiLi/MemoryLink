@@ -14,7 +14,7 @@ extension MTKView : RenderDestinationProvider {
 }
 
 
-class ViewController: UIViewController, MTKViewDelegate, ARSessionDelegate {
+class MasterViewController: UIViewController, MTKViewDelegate, ARSessionDelegate {
     
     var session: ARSession!
     var renderer: Renderer!
