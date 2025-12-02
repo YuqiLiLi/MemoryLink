@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReminiscAR - Lo-Fi Prototype</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- iPhone Frame Container -->
+    <div class="iphone-frame">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span class="time">9:41</span>
+            <div class="status-icons">
+                <span class="signal">📶</span>
+                <span class="wifi">📡</span>
+                <span class="battery">🔋</span>
+            </div>
+        </div>
+
+        <!-- App Screen -->
+        <div class="app-screen" id="appScreen">
+            <!-- Home Screen -->
+            <div class="screen active" id="homeScreen">
+                <div class="app-header">
+                    <h1>ReminiscAR</h1>
+                    <p class="tagline">Memories anchored in everyday moments</p>
+                </div>
+                
+                <div class="home-preview">
+                    <div class="preview-stats">
+                        <div class="stat-card">
+                            <div class="stat-number">8</div>
+                            <div class="stat-label">Memory Nodes</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">3</div>
+                            <div class="stat-label">Contributors</div>
+                        </div>
+                    </div>
+
+                    <div class="recent-memories">
+                        <h3>Recent Memories</h3>
+                        <div class="memory-preview-item">
+                            <span class="preview-icon">☕️</span>
+                            <span class="preview-text">Grandma's Paris mug</span>
+                            <span class="preview-time">2 days ago</span>
+                        </div>
+                        <div class="memory-preview-item">
+                            <span class="preview-icon">📷</span>
+                            <span class="preview-text">Old photo album</span>
+                            <span class="preview-time">5 days ago</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="enter-btn" onclick="enterApp()">
+                    <span class="enter-icon">✨</span>
+                    <span>Explore Memories</span>
+                </button>
+            </div>
+
+            <!-- Storytelling Mode Screens -->
+            <!-- Camera View -->
+            <div class="screen" id="cameraView">
+                <div class="camera-overlay">
+                    <div class="back-btn" onclick="backToHome()">← Back</div>
+                    <div class="camera-hint">Point at an object to begin</div>
+                    
+                    <!-- Simulated Camera View -->
+                    <div class="camera-frame">
+                        <div class="object-detected" id="objectDetected">
+                            <div class="scan-box">
+                                <div class="scan-line"></div>
+                            </div>
+                            <div class="ar-prompt" id="arPrompt">
+                                ✨ Would you like to share a story about this object?
+                                <button class="record-btn" onclick="startRecording()">Record Memory</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recording Screen -->
+            <div class="screen" id="recordingScreen">
+                <div class="recording-overlay">
+                    <div class="recording-header">
+                        <div class="rec-indicator">🔴 Recording</div>
+                        <div class="timer" id="timer">0:00</div>
+                    </div>
+
+                    <div class="camera-preview">
+                        <div class="object-focus">☕️ Coffee Mug</div>
+                    </div>
+
+                    <div class="audio-visualizer">
+                        <div class="wave-bars">
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                        </div>
+                    </div>
+
+                    <div class="live-caption">
+                        <p id="captionText">"This mug was a gift from my daughter when she visited Paris..."</p>
+                    </div>
+
+                    <button class="stop-btn" onclick="stopRecording()">Stop & Save</button>
+                </div>
+            </div>
+
+            <!-- Memory Created Screen -->
+            <div class="screen" id="memoryCreated">
+                <div class="success-overlay">
+                    <div class="memory-node-preview">
+                        <div class="glowing-orb">
+                            <div class="orb-inner">✨</div>
+                        </div>
+                        <div class="anchor-line"></div>
+                        <div class="object-icon">☕️</div>
+                    </div>
+
+                    <h2>Memory Node Created!</h2>
+                    <div class="memory-label">
+                        <input type="text" id="memoryTitle" placeholder="Enter memory title..." value="Grandma's Paris mug">
+                    </div>
+
+                    <div class="memory-details">
+                        <p>📝 Transcript saved</p>
+                        <p>🎙️ Audio: 45 seconds</p>
+                        <p>📍 Anchored to: Coffee mug</p>
+                    </div>
+
+                    <button class="done-btn" onclick="backToHome()">Done</button>
+                    <button class="add-more-btn" onclick="switchToMode('storytelling')">Add Another Memory</button>
+                </div>
+            </div>
+
+            <!-- Main App Screen with Tab Navigation -->
+            <div class="screen" id="mainApp">
+                <div class="app-nav">
+                    <div class="back-btn" onclick="backToHome()">← Back</div>
+                    <div class="nav-tabs">
+                        <button class="tab-btn active" onclick="switchTab('ar')">
+                            🔍 AR View
+                        </button>
+                        <button class="tab-btn" onclick="switchTab('list')">
+                            📋 List View
+                        </button>
+                    </div>
+                </div>
+
+                <!-- AR View Tab -->
+                <div class="tab-content active" id="arViewTab">
+                    <div class="scan-header">
+                        <h3>Scanning for memories...</h3>
+                        <button class="map-btn" onclick="showMemoryMap()">🗺️ Map View</button>
+                    </div>
+
+                    <div class="ar-scan-frame">
+                        <div class="memory-indicator nearby">
+                            <div class="arrow-indicator">→</div>
+                            <p>Grandma's memory nearby</p>
+                        </div>
+
+                        <div class="memory-nodes-preview">
+                            <div class="node-marker node-1" onclick="openMemoryNode()">
+                                <div class="node-glow"></div>
+                                ✨
+                            </div>
+                            <div class="node-marker node-2">
+                                <div class="node-glow"></div>
+                                ✨
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="memory-list">
+                        <p class="found-count">Found 2 memory nodes nearby</p>
+                    </div>
+                </div>
+
+                <!-- List View Tab -->
+                <div class="tab-content" id="listViewTab">
+                    <div class="list-header">
+                        <h3>All Memories</h3>
+                        <div class="sort-filter">
+                            <select class="filter-select">
+                                <option>Most Recent</option>
+                                <option>Oldest First</option>
+                                <option>By Object</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="memories-list-container">
+                        <div class="memory-list-item" onclick="openMemoryNode()">
+                            <div class="list-item-icon">☕️</div>
+                            <div class="list-item-content">
+                                <h4>Grandma's Paris mug</h4>
+                                <p class="list-item-meta">by Grandma • 3 days ago</p>
+                                <p class="list-item-preview">"This mug was a gift from my daughter when she visited Paris..."</p>
+                                <div class="list-item-stats">
+                                    <span>🎙️ 0:45</span>
+                                    <span>💬 1 response</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="memory-list-item">
+                            <div class="list-item-icon">📷</div>
+                            <div class="list-item-content">
+                                <h4>Old photo album</h4>
+                                <p class="list-item-meta">by Grandpa • 5 days ago</p>
+                                <p class="list-item-preview">"These photos are from our honeymoon in Hawaii..."</p>
+                                <div class="list-item-stats">
+                                    <span>🎙️ 1:23</span>
+                                    <span>💬 3 responses</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="memory-list-item">
+                            <div class="list-item-icon">🪑</div>
+                            <div class="list-item-content">
+                                <h4>Rocking chair</h4>
+                                <p class="list-item-meta">by Grandma • 1 week ago</p>
+                                <p class="list-item-preview">"I used to rock your mother to sleep in this chair..."</p>
+                                <div class="list-item-stats">
+                                    <span>🎙️ 2:15</span>
+                                    <span>💬 5 responses</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="memory-list-item">
+                            <div class="list-item-icon">📚</div>
+                            <div class="list-item-content">
+                                <h4>Recipe book</h4>
+                                <p class="list-item-meta">by Grandma • 2 weeks ago</p>
+                                <p class="list-item-preview">"This recipe for apple pie has been in our family for generations..."</p>
+                                <div class="list-item-stats">
+                                    <span>🎙️ 1:05</span>
+                                    <span>💬 2 responses</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Memory Node Detail -->
+            <div class="screen" id="memoryDetail">
+                <div class="detail-overlay">
+                    <div class="back-btn" onclick="backToScan()">← Back</div>
+                    
+                    <div class="node-header">
+                        <div class="node-icon-large">✨</div>
+                        <h2>Grandma's Paris mug</h2>
+                        <p class="memory-date">Created 3 days ago by Grandma</p>
+                    </div>
+
+                    <div class="audio-player">
+                        <button class="play-btn" onclick="togglePlay()">▶️</button>
+                        <div class="audio-progress">
+                            <div class="progress-bar"></div>
+                        </div>
+                        <span class="duration">0:45</span>
+                    </div>
+
+                    <div class="transcript">
+                        <h4>Transcript</h4>
+                        <p>"This mug was a gift from my daughter when she visited Paris. Every morning when I use it, I remember that wonderful trip we took together to the Eiffel Tower. The coffee tastes better in this mug, I swear!"</p>
+                    </div>
+
+                    <div class="responses">
+                        <h4>Family Responses</h4>
+                        <div class="response-bubble">
+                            <div class="response-header">
+                                <strong>Sarah (Daughter)</strong>
+                                <span class="response-date">2 days ago</span>
+                            </div>
+                            <p>"I remember that day too, Mom! You were so happy. Love you ❤️"</p>
+                        </div>
+                    </div>
+
+                    <button class="respond-btn" onclick="showResponseInput()">💬 Add Your Response</button>
+                </div>
+            </div>
+
+            <!-- Response Input -->
+            <div class="screen" id="responseInput">
+                <div class="response-overlay">
+                    <div class="back-btn" onclick="backToDetail()">← Cancel</div>
+                    
+                    <h3>Add Your Response</h3>
+
+                    <div class="response-options">
+                        <button class="option-btn active" onclick="setResponseType('text')">
+                            💬 Text
+                        </button>
+                        <button class="option-btn" onclick="setResponseType('voice')">
+                            🎙️ Voice
+                        </button>
+                    </div>
+
+                    <div class="input-area" id="textInput">
+                        <textarea placeholder="Share your thoughts or memories..."></textarea>
+                    </div>
+
+                    <div class="input-area hidden" id="voiceInput">
+                        <button class="voice-record-btn">
+                            <div class="mic-icon">🎙️</div>
+                            <p>Tap to record</p>
+                        </button>
+                    </div>
+
+                    <button class="submit-btn">Send Response</button>
+                </div>
+            </div>
+
+            <!-- Memory Map View -->
+            <div class="screen" id="memoryMap">
+                <div class="map-overlay">
+                    <div class="back-btn" onclick="backToScan()">← Back to AR</div>
+                    
+                    <h3>Memory Map</h3>
+                    <p class="map-subtitle">All saved memories in this space</p>
+
+                    <div class="map-container">
+                        <div class="room-layout">
+                            <div class="memory-pin" style="top: 30%; left: 40%;" onclick="openMemoryNode()">
+                                <div class="pin-icon">✨</div>
+                                <span class="pin-label">Paris mug</span>
+                            </div>
+                            <div class="memory-pin" style="top: 60%; left: 70%;">
+                                <div class="pin-icon">✨</div>
+                                <span class="pin-label">Photo album</span>
+                            </div>
+                            <div class="memory-pin" style="top: 50%; left: 25%;">
+                                <div class="pin-icon">✨</div>
+                                <span class="pin-label">Rocking chair</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="map-legend">
+                        <p>Tap any memory to view details</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Home Indicator (iPhone bottom bar) -->
+        <div class="home-indicator"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
